@@ -66,7 +66,6 @@ import warnings
 MU_SUN = 0.000295912208  # AU^3/dia^2
 C_LIGHT = 173.1446 # AU/dia
 eph = load('de440.bsp')
-# eph = load('de421.bsp')
 
 
 # --------------------------------------------------------------------------------------------------------
@@ -87,29 +86,91 @@ def convert_to_cartesian(ra, dec):
 
 
 # --------------------------------------------------------------------------------------------------------
-def get_earth_position_and_velocity(times):
+def get_earth_position_and_velocity(times, observatory=None):
    """
-   Returns the position and velocity of the Earth at a given time
-
-   Args:
-      times (list): List of datetime objects
-   
-   Returns:
-      np.array: Earth's position vector
-      np.array: Earth's velocity vector
+   Enhanced function to get Earth positions efficiently
    """
    ts = load.timescale()
    sun = eph['sun']
    earth = eph['earth']
-   R = []
-   v = []
-   for t in times:
-      t_sf = ts.utc(t.year, t.month, t.day, t.hour, t.minute, t.second + t.microsecond / 1e6)
-      pos = earth.at(t_sf).position.au - sun.at(t_sf).position.au
-      vel = earth.at(t_sf).velocity.au_per_d - sun.at(t_sf).velocity.au_per_d
-      R.append(pos)
-      v.append(vel)
+   t_years = np.array([t.year for t in times])
+   t_months = np.array([t.month for t in times])
+   t_days = np.array([t.day for t in times])
+   t_hours = np.array([t.hour for t in times])
+   t_minutes = np.array([t.minute for t in times])
+   t_seconds = np.array([t.second + t.microsecond / 1e6 for t in times])
+   t_sf = ts.utc(t_years, t_months, t_days, t_hours, t_minutes, t_seconds)
+   
+   # operaçao vetorizada
+   earth_positions = earth.at(t_sf)
+   sun_positions = sun.at(t_sf)
+   positions = earth_positions.position.au - sun_positions.position.au
+   velocities = earth_positions.velocity.au_per_d - sun_positions.velocity.au_per_d
+   R = [positions[:, i] for i in range(positions.shape[1])]
+   v = [velocities[:, i] for i in range(velocities.shape[1])]
+
+   if observatory is not None:
+      for i, t in enumerate(times):
+         topo_offset = get_topocentric_correction(
+               observatory['lat'], 
+               observatory['lon'], 
+               observatory['alt'], 
+               t
+         )
+         gast = t_sf[i].gast * 15 
+         gast_rad = np.radians(gast)
+         sin_gast = np.sin(gast_rad)
+         cos_gast = np.cos(gast_rad)
+         rotated_offset = np.array([
+               topo_offset[0] * cos_gast - topo_offset[1] * sin_gast,
+               topo_offset[0] * sin_gast + topo_offset[1] * cos_gast,
+               topo_offset[2]
+         ])
+         R[i] = R[i] + rotated_offset
+         earth_rot_rate = 2 * np.pi / 86400  # rad/s
+         earth_rot_rate_per_day = earth_rot_rate * 86400  # rad/d
+         vel_correction = np.array([
+               -earth_rot_rate_per_day * topo_offset[1],
+               earth_rot_rate_per_day * topo_offset[0],
+               0.0
+         ])
+         v[i] = v[i] + vel_correction
    return np.array(R), np.array(v)
+
+
+# --------------------------------------------------------------------------------------------------------
+def get_topocentric_correction(lat, lon, alt, time):
+    """
+    Calculate topocentric correction vector for an observatory
+    
+    Args:
+        lat (float): Observatory latitude in degrees
+        lon (float): Observatory longitude in degrees
+        alt (float): Observatory altitude in meters
+        time (datetime): Time of observation
+    
+    Returns:
+        np.array: Topocentric correction vector in AU
+    """
+    # raio da terra no equador (km)
+    R_earth = 6378.137
+    lat_rad = np.radians(lat)
+    lon_rad = np.radians(lon)
+
+    ts = load.timescale()
+    t_sf = ts.utc(time.year, time.month, time.day, time.hour, time.minute, time.second + time.microsecond / 1e6)
+    earth_rotation = t_sf.gast * 15 
+    earth_rotation_rad = np.radians(earth_rotation)
+
+    # calcula a posiçao do observatorio 
+    r_obs = np.array([
+        (R_earth / 1000 + alt / 1000000) * np.cos(lat_rad) * np.cos(lon_rad + earth_rotation_rad),
+        (R_earth / 1000 + alt / 1000000) * np.cos(lat_rad) * np.sin(lon_rad + earth_rotation_rad),
+        (R_earth / 1000 + alt / 1000000) * np.sin(lat_rad)
+    ])
+    # conversao (certo dessa vez)
+    r_obs_au = r_obs / 149597870.7
+    return r_obs_au
 
 
 # --------------------------------------------------------------------------------------------------------
@@ -133,27 +194,37 @@ def equations_of_motion(t, y, mu):
 
 
 # --------------------------------------------------------------------------------------------------------
-def propagate_orbit(r0, v0, t, t_ref, mu):
+def propagate_orbit(r0, v0, t, t_ref, mu, perturbations=None):
    """
-   Propagates the orbit of an object given its initial position and velocity
-
-   Args:
-      r0 (np.array): Initial position vector
-      v0 (np.array): Initial velocity vector
-      t (list): List of datetime objects
-      t_ref (datetime): Reference time
-      mu (float): Gravitational parameter
+   Enhanced orbit propagation with optional perturbation forces
    
-   Returns:
-      np.array: Position vector
-      np.array: Velocity vector
+   Args:
+      r0, v0: Initial state vectors
+      t: List of datetime objects
+      t_ref: Reference time
+      mu: Gravitational parameter
+      perturbations: Optional function for additional accelerations
    """
    t_days = np.array([(ti - t_ref).total_seconds() / 86400 for ti in t])
    t_span = (min(t_days), max(t_days)) if len(t_days) > 1 else (0, t_days[0] if t_days[0] > 0 else 0.001)
    y0 = np.hstack((r0, v0))
-   sol = solve_ivp(equations_of_motion, t_span, y0, t_eval=t_days, method='RK45', rtol=1e-12, atol=1e-14, args=(mu,))
+   def equations_with_perturbations(t, y, mu): # adicionei perturbação
+      r = y[:3]
+      v = y[3:]
+      r_norm = np.linalg.norm(r)
+      a = -mu * r / r_norm**3
+      if perturbations is not None:
+         a_pert = perturbations(t, r, v)
+         a = a + a_pert   
+      return np.hstack((v, a))
+   sol = solve_ivp(equations_with_perturbations, t_span, y0, t_eval=t_days, 
+      method='DOP853',  # testando um metodo de ordem maior
+      rtol=1e-12, 
+      atol=1e-14, 
+      args=(mu,)
+   )
    if not sol.success:
-      raise ValueError("Falha na integração numérica: " + sol.message)
+      raise ValueError("Integration failed: " + sol.message)
    return sol.y[:3].T, sol.y[3:].T
 
 
@@ -323,7 +394,7 @@ def iod_initial_estimate(R, rho_hat, t):
 
 
 # --------------------------------------------------------------------------------------------------------
-def differential_correction(R, v_earth, rho_hat, t, mu_sun):
+def differential_correction(R, v_earth, rho_hat, t, mu_sun, perturbations=None):
    """
    Applies differential correction to refine the initial estimate of the object's orbit
 
@@ -442,7 +513,7 @@ def differential_correction(R, v_earth, rho_hat, t, mu_sun):
       else:
          penalty += 1000
       try:
-         r_pred, _ = propagate_orbit(r0, v0, t, t[0], mu_sun)
+         r_pred, _ = propagate_orbit(r0, v0, t, t[0], mu_sun, perturbations)
       except Exception as e:
          return np.ones(len(t) * 3) * 1e8 + penalty
       weights = np.linspace(1.2, 0.8, len(t))
@@ -547,21 +618,23 @@ def calculate_orbital_elements(r, v, mu):
 
 
 # --------------------------------------------------------------------------------------------------------
-def process_asteroid(name, observations):
+def process_asteroid(name, observations, observatory=None):
    """
    Processa observações de um asteroide e determina sua órbita
    """
    print(f"\n### Calculando órbita de {name} usando {len(observations)} observaçoes###")
    t = [obs["timestamp"] for obs in observations]
    rho_hat = [convert_to_cartesian(obs["RA"], obs["DEC"]) for obs in observations]
-   R, v_earth = get_earth_position_and_velocity(t)
+   R, v_earth = get_earth_position_and_velocity(t, observatory)
    rho_initial = np.ones(len(t))
 
-   for iteration in range(5):
+   for iteration in range(10):
       print(f"Iteração {iteration + 1}:")
       t_corr = light_travel_correction(rho_initial, t)
       R, v_earth = get_earth_position_and_velocity(t_corr)
-      r_final, v_final = differential_correction(R, v_earth, rho_hat, t_corr, MU_SUN)
+      def perturbation_model(t, r, v):
+            return solar_system_perturbations(t, r, v, t_corr[0])
+      r_final, v_final = differential_correction(R, v_earth, rho_hat, t_corr, MU_SUN, perturbation_model)
       if r_final is None:
          print("Falha na convergência desta iteração. Tentando novamente...")
          rho_initial *= 0.7
@@ -577,7 +650,9 @@ def process_asteroid(name, observations):
       print("Falha ao encontrar órbita válida após todas as iterações.")
       return
    a, e, i, Omega, omega, theta = calculate_orbital_elements(r_final, v_final, MU_SUN)
-   r_pred, _ = propagate_orbit(r_final, v_final, t_corr, t_corr[0], MU_SUN)
+   def perturbation_model(t, r, v):
+      return solar_system_perturbations(t, r, v, t_corr[0])
+   r_pred, _ = propagate_orbit(r_final, v_final, t_corr, t_corr[0], MU_SUN, perturbation_model)
    residuos_ang = []
    for j in range(len(t)):
       rho_vec = r_pred[j] - R[j]
@@ -597,6 +672,7 @@ def process_asteroid(name, observations):
    print(f"Ω = {Omega:.6f}°")
    print(f"ω = {omega:.6f}°")
    print(f"θ = {theta:.6f}°")
+
    
    if name == "Apophis":
       a_real = 0.9223
@@ -615,4 +691,43 @@ def process_asteroid(name, observations):
       print(f"a real ≈ {a_real:.4f} UA, diferença: {abs(a - a_real):.4f} UA")
       print(f"e real ≈ {e_real:.4f}, diferença: {abs(e - e_real):.4f}")
       print(f"i real ≈ {i_real:.2f}°, diferença: {abs(i - i_real):.2f}°")
+   
 
+# --------------------------------------------------------------------------------------------------------
+def solar_system_perturbations(t, r, v, t_ref):
+   """
+   Calculate perturbation accelerations from major solar system bodies
+   
+   Args:
+      t: Current time (days since t_ref)
+      r: Position vector (AU)
+      t_ref: Reference datetime
+   
+   Returns:
+      np.array: Perturbing acceleration vector (AU/day^2)
+   """
+   current_time = t_ref + timedelta(days=float(t))
+   ts = load.timescale()
+   t_sf = ts.utc(current_time.year, current_time.month, current_time.day, current_time.hour, current_time.minute, current_time.second)
+   
+   sun = eph['sun']
+   jupiter = eph['jupiter barycenter']
+   saturn = eph['saturn barycenter']
+   venus = eph['venus barycenter']
+   earth = eph['earth']
+   
+   planets = [jupiter, saturn, venus, earth]
+   planet_names = ['Jupiter', 'Saturn', 'Venus', 'Earth']
+   planet_mus = [9.547e-4, 2.858e-4, 2.448e-6, 3.003e-6]  # AU^3/day^2
+   a_pert = np.zeros(3)
+
+   for planet, name, mu_planet in zip(planets, planet_names, planet_mus):
+      planet_pos = planet.at(t_sf).position.au - sun.at(t_sf).position.au
+      r_to_planet = planet_pos - r
+      r_to_planet_norm = np.linalg.norm(r_to_planet)
+      # perturbaçao direta
+      a_direct = mu_planet * r_to_planet / r_to_planet_norm**3
+      # perturbaçao indireta
+      a_indirect = -mu_planet * planet_pos / np.linalg.norm(planet_pos)**3
+      a_pert += a_direct + a_indirect
+   return a_pert
