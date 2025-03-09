@@ -1,0 +1,209 @@
+list_fits                                         | input list of fits images for header extraction
+header_output                                     | output file with extracted information
+|-------------------------------------------------|   *** Science information ***
+OBJECT  |-----------------------------------------| FITS header keyword: Target name    
+FILTERID|-----------------------------------------| FITS header keyword: Filter designation
+|-------------------------------------------------|   *** Dimensions ***
+01|-----------------------------------------------| PRAIA stamp axes key: (x,y) axes dimensions: (1) Two keywords setup; (2) One keyword setup 
+|-------------------------------------------------|   *** Two keywords setup ***
+NAXIS1  |-----------------------------------------| FITS header keyword : dimension of axis 1 (x) 
+NAXIS2  |-----------------------------------------| FITS header keyword : dimension of axis 2 (y) 
+|-------------------------------------------------|   *** One keyword setup ***
+WINSEC1 |-----------------------------------------| FITS header keyword : dimension of axes (1,2) = (x,y) together (windows-like section keyword)
+|-------------------------------------------------|   *** (RA, Dec) coordinates ***
+06|-----------------------------------------------| PRAIA stamp WCS key: Right Ascension
+04|-----------------------------------------------| PRAIA stamp WCS key: Declination
+|-------------------------------------------------|   *** (RA, Dec) given in one WCS keyword for each ccordinate ***
+OBJCTRA |-----------------------------------------| FITS header WCS keyword: Right Ascension (PRAIA RA  stamp key 1 to 5 only)
+OBJCTDEC|-----------------------------------------| FITS header WCS keyword: Declination     (PRAIA Dec stamp key 1 to 3 only)
+|-------------------------------------------------|   *** (RA, Dec) given in tangent plane WCS keywords ***
+01|-----------------------------------------------| PRAIA key: WCS tangent plane convention: (1) FITS Standard; (2) Old (AIPS); (3) SAO polynomials   (RA key 6, Dec key 4 only)
+01|-----------------------------------------------| PRAIA key: WCS tangent plane RA---TAN coordinate units: 01 = DEG; 02 = RAD; 03 = HOUR                       (RA  key 6 only)
+01|-----------------------------------------------| PRAIA key: WCS tangent plane DEC--TAN coordinate units: 01 = DEG; 02 = RAD;                                 (Dec key 4 only)
+|-------------------------------------------------|   *** (RA, Dec) in tangent plane format with SAO polynomials ***
+13|-----------------------------------------------| PRAIA key: SAO polynomial in x (RA) : number of available coefficients in x            (RA key 6, Dec key 4, WCS key 4 only)
+13|-----------------------------------------------| PRAIA key: SAO polynomial in y (Dec): number of available coefficients in y            (RA key 6, Dec key 4, WCS key 4 only)
+02|-----------------------------------------------| PRAIA key: SAO polynomial in x (RA) : coordinate units: 01 = DEG; 02 = RAD; 03 = HOUR  (RA key 6, Dec key 4, WCS key 4 only)
+02|-----------------------------------------------| PRAIA key: SAO polynomial in y (Dec): coordinate units: 01 = DEG; 02 = RAD             (RA key 6, Dec key 4, WCS key 4 only)
+AMDX    |-----------------------------------------| PRAIA keyword: SAO polynomial in x (RA): root of coefficient keyword string            (RA key 6, Dec key 4, WCS key 4 only)
+AMDY    |-----------------------------------------| PRAIA keyword: SAO polynomial in y (Dec): root of coefficient keyword string           (RA key 6, Dec key 4, WCS key 4 only)
+|-------------------------------------------------|   *** Time ***
+1 |-----------------------------------------------| PRAIA stamp time key
+|-------------------------------------------------|   *** Time extracted from FITS header ***
+JD      |-----------------------------------------| FITS header keyword: Start instant of exposure, Julian Date
+MJD-BEG |-----------------------------------------| FITS header keyword: Start instant of exposure, Modified Julian Date
+DATE-OBS|-----------------------------------------| FITS header keyword: Start Gregorian date of exposure (with or without hh mm ss.sss start instant), UTC
+TM-START|-----------------------------------------| FITS header keyword: Start instant of exposure (hh mm ss.sss or variations), UTC
+TIME-END|-----------------------------------------| FITS header keyword: End   instant of exposure (hh mm ss.sss or variations), UTC
+TIME    |-----------------------------------------| FITS header keyword: Start and End exposure instants (hh mm ss.sss or variations), UTC
+EXPTIME |-----------------------------------------| FITS header keyword: Exposure time (FITS header units)
+1.0                                               | PRAIA exposure factor F: converts FITS header exposure time units to seconds: exp(s) = F * exp(header)
+0.0                                               | PRAIA FITS header exposure time correction (seconds) (put zero if no correction needed)
+|-------------------------------------------------|   *** Time input by the User ***
+59870.52504981574                                 | Start time of 1rst image in the input list: Julian Date (PRAIA stamp time key = -1) or Modified Julian Date (time key = -2)
+2022                                              | Year    of starting time of 1rst image in the input list (PRAIA stamp time key = -3 only)
+10                                                | Month   of starting time of 1rst image in the input list (PRAIA stamp time key = -3 only)
+18                                                | Day     of starting time of 1rst image in the input list (PRAIA stamp time key = -3 only)
+12                                                | Hours   of starting time of 1rst image in the input list (PRAIA stamp time key = -3 only)
+36                                                | Minutes of starting time of 1rst image in the input list (PRAIA stamp time key = -3 only)
+04.3041                                           | Seconds of starting time of 1rst image in the input list (PRAIA stamp time key = -3 only)
+0.3                                               | Exposure time (seconds) (PRAIA stamp time keys -1, -2 or -3)
+0.3                                               | Cycle time (s) (time interval between consecutive exposure start times; PRAIA stamp time keys -1, -2 or -3)
+|-------------------------------------------------|   *** Time instant offsets (valid for all PRAIA stamp time keys) ***
+0000.0                                            | PRAIA time instant offset (Julian years)
+00.0                                              | PRAIA time instant offset (Julian months of 30.5 days)
+00.0                                              | PRAIA time instant offset (days)  
+00.0                                              | PRAIA time instant offset (hours)
+00.0                                              | PRAIA time instant offset (minutes)
+00.000                                            | PRAIA time instant offset (seconds)
+********************************************************************************************************************************************************************************
+                                          
+
+
+
+  ** For a correct filling up of the above fields, please read the notes below carefully ** 
+           
+
+                                                     
+** Choose the PRAIA stamp axes key for axes dimensions according to one of the following options:
+
+
+01 - x and y axes dimensions furnished in separate keywords (usually "NAXIS1" and "NAXIS2" for x and y respectively).
+
+02 - x and y axes dimensions furnished together in one keyword (usually "WINSEC"), in the form [N1_1:N1_2,N2_1:N2_2],
+     where:
+
+     NAXIS1 = N1_2 - N1_1 + 1
+     NAXIS2 = N2_2 - N2_1 + 1
+
+
+                                                     
+** Choose the PRAIA stamp time key according to one of the following options:
+
+
+
+       Negative options mean time input by the user:
+ 
+ 
+-3 - Time input by the user, with reference instant in Gregorian Date
+ 
+ 
+-2 - Time input by the user, with reference instant in Modified Julian Date (MJD)
+ 
+ 
+-1 - Time input by the user, with reference instant in Julian Date (JD)
+
+ 
+ 
+       Positive options mean time retrieved from the FITS header:
+ 
+
++1 - Start date and time furnished together in one line/keyword: yr mo day (day mo yr) and hh mm ss.sss (usually
+     at "DATE-OBS" keyword).
+
+
++2 - Start date and time in separate lines/keywords: yr mo day (day mo yr) usually furnished in "DATE-OBS" keyword.
+
+     If the exposure time is given, only the UTC start time (usually hh mm ss.sss) is needed, and given in a
+     separate keyword (usually "UT" or "TIME-BEG" keywords).
+
+     If the exposure time is not given, then the UTC start and end exposure times must be furnished. They
+     can be evoked by separate keywords (usually "UT"/"TIME-BEG" and "TIME-END" keys), or evoked by the same
+     keyword (user-defined, usually "TIME"), usually in the hh mm ss.sss format.
+
+     The start and end times may be also furnished in hh mm.mmm or even in sss.sss format. 
+
+
++3 - Start time in Julian Date (JD): the date is computed from the JD (usually furnished by the
+     "JD" keyword); the exposure time must be also furnished.
+
+
++4 - Start time in Modified Julian Date (MJD): the date is computed from the MJD (usually
+     furnished by the "MJD" keyword); the exposure time must be also furnished.
+
+
+
+
+
+** Choose the PRAIA stamp WCS key for Right Ascension according to one of the following options:
+
+
+01 - RA in sexagesimal format:  hh mm ss.sss  (hours)
+
+02 - RA in sexagesimal format:  dg mm ss.sss  (degrees)
+
+03 - RA in hours and decimal fraction:  hh.hhhhh
+
+04 - RA in degrees and decimal fraction:  dg.dgdgdg
+
+05 - RA in radians:  rad.radradrad
+
+06 - RA from tangent plane projection (RA---TAN), see WCS convention keys/keywords
+
+
+
+
+
+** Choose the PRAIA stamp WCS key for Declination according to one of the following options:
+
+
+01 - Dec in sexagesimal format:  dg mm ss.sss  (degrees)
+
+02 - Dec in degrees and decimal fraction:  dg.dgdgdg
+
+03 - Dec in radians: rad.radradrad
+
+04 - Dec from tangent plane projection (DEC---TAN), see WCS convention keys/keywords
+
+
+
+
+
+**** WCS convention keys/keywords (RA---TAN, DEC--TAN) for alternative (RA,DEC) extraction:
+
+
+01 - Standard system.  Requires the following keywords in FITS headers:
+
+CRPIX1                        
+CRVAL1 
+CD1_1
+CD1_2
+
+CRPIX2                        
+CRVAL2 
+CD2_1
+CD2_2
+
+
+
+
+02 - Old system (AIPS). Requires the following keywords in FITS headers:
+
+CRPIX1                        
+CRVAL1 
+CDELT1 
+CROTA1 
+
+CRPIX2 
+CRVAL2 
+CDELT2 
+CROTA2  
+
+
+03 - SAO polynomial system. Astrometric (x,y) polynomial of Nth-degree,
+     relating (X,Y) standard coordinates with (x,y) CCD coordinates. 
+     Usually, the polynomial coefficients come from actual astrometric
+     adjustments with regard to some reference catalogue. The coefficients
+     of the (X,Y) polynomial model obey the relation:
+
+
+     X=a0+a1*x+a2*y+a3*x^2+a4*x*y+a5*y^2+a6*x^3+a7*x^2*y+a8*x*y^2+a9*y^3+...
+
+     Y=b0+b1*x+b2*y+b3*x^2+b4*x*y+b5*y^2+b6*x^3+b7*x^2*y+b8*x*y^2+b9*y^3+...
+
+     The (X,Y) coefficient keys are usually given in the form (AMDX..., AMDY...).
+
+     The root string of the X and Y coefficient keywords, and coefficient values,
+     are required. 
+
+

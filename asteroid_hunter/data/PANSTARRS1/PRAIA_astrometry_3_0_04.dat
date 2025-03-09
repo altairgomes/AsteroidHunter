@@ -1,0 +1,229 @@
+300000                                            | Maximum number of FOV objects
+3000000                                           | Maximum number of FOV-extracted Gaia DR3 catalogue stars
+1000000                                           | Maximum number of FOV-extracted 2MASS catalogue stars
+4097                                              | Maximum FOV size in x (pixels)
+4097                                              | Maximum FOV size in y (pixels)
+00.0                                              | Magnitude cutoffs: minimum magnitude defining Gaia_DR3 catalogue solution
+30.0                                              | Magnitude cutoffs: maximum magnitude defining Gaia_DR3 catalogue solution
+0                                                 | Key to cut Gaia DR3 stars without proper motions  : (0) do not cut; (1) cut
+0                                                 | Key to cut Gaia DR3 stars without parallax        : (0) do not cut; (1) cut
+0                                                 | Key to cut Gaia DR3 stars with dupliticy          : (0) do not cut; (1) cut
+GAIA2_User_Catalogue.cat                          | User reference catalogue (PRAIA format) 
+Ephemcat.cat                                      | Ephemeris reference catalogue (PRAIA format)
+2                                                 | (RA,Dec) reduction with User reference catalogue: (1) Do it; (2) Do not do it 
+2                                                 | (RA,Dec) reduction with Ephemeris reference catalogue: (1) Do it; (2) Do not do it 
+0                                                 | (0) Astrometry of fits images .:. Remake astrometry from PRAIA's previous: (1) measured (x,y)s ; (2) measured (RA,DEC)s (tangent plane technique)
+header_output                                     | Astrometry option = 0: file with extracted header data from fits images .:. option = 1,2: list of PRAIA xy files for remaking astrometry
+targets                                           | Targets input file: (RA,Dec), JD, target name
+1                                                 | FDP file type: (1) d(x,y)s (pixels) or d(RA,Dec)s (") mask; (2) (x,y)/(RA,Dec) 3rd degree distortion polynomial; (3) = polynomial FITS keywords; (4) DES
+fdp_DES.dat                                       | FDP (Field Distortion Pattern) file (images/remaking astrometry) with polinomial coeffs. or mask for d(x,y)s or d(RA,Dec)s (tangent plane technique)
+4                                                 | n nearest points for FDP mask interpolation (FDP file type 1 only)
+1                                                 | Output (x,y)s: (1) without FDP correction (keeps original xys in all astrometry modes); (2) with FDP correction (tangent plane xys in astrometry mode 2)
+bad_boxes.pix                                     | Mask of bad pixels: rectangular regions (xmin, xmax, ymin, ymax, key) (only applies for astrometry mode 0) .:. cut inside  regions => key > 0
+bad_circles.pix                                   | Mask of bad pixels: circular regions (xc, xc, radius, key)           (only applies for astrometry mode 0)  .:. cut outside regions => key < 0
+bad_fluxes.pix                                    | Mask of bad pixels: ADU counting range (count_min, count_max, key) of bad pixels to exclude (only applies for astrometry mode 0) .:. cut inside/outside
+astrometry_photometry_Gaia_DR3                    | Photometric statistics of each field                                                                                                range: key > or < 0
+astrometry_reduction_Ephemcat                     | Reduction statistics of each field with the Ephemeris catalogue
+astrometry_reduction_Gaia_DR3                     | Reduction statistics of each field with the Gaia DR3 catalogue
+astrometry_reduction_CUSER                        | Reduction statistics of each field with the User catalogue
+astrometry_target_PRAIA_Ephemcat                  | Target file PRAIA format for Ephemeris catalogue solution
+astrometry_target_PRAIA_Gaia_DR3                  | Target file PRAIA format for Gaia DR3 solution
+astrometry_target_PRAIA_CUSER                     | Target file PRAIA format for User reference catalogue solution
+astrometry_target_MPC_Ephemcat                    | Target file MPC format for Ephemeris catalogue solution
+astrometry_target_MPC_Gaia_DR3                    | Target file MPC format for Gaia DR3 solution
+astrometry_target_MPC_CUSER                       | Target file MPC format for User reference catalogue solution
+astrometry_target_NIMA_Ephemcat                   | Target file NIMA format for Ephemeris catalogue solution
+astrometry_target_NIMA_Gaia_DR3                   | Target file NIMA format for Gaia DR3 solution
+astrometry_target_NIMA_CUSER                      | Target file NIMA format for User reference catalogue solution
+C|------------------------------------------------| MPC designation for observation type (Note 2 in https://www.minorplanetcenter.net/iau/info/OpticalObs.html) 
+i|------------------------------------------------| Magnitude bandpass for target MPC output format only
+F51|----------------------------------------------| IAU code of observation site or user-based site designation for target NIMA/MPC output formats only
+W|------------------------------------------------| User Catalogue MPC code for target NIMA/MPC output formats only 
+ephemcat.red.xy                                   | Extension of "xy" output file, Ephemeris catalogue reduction
+gaia_DR3.red.xy                                   | Extension of "xy" output file, Gaia DR3 reduction
+cuser.red.xy                                      | Extension of "xy" output file, User Catalogue reduction
+ephemcat.reg                                      | Extension of "ds9" output file, Ephemeris catalogue reduction
+gaia_DR3.reg                                      | Extension of "ds9" output file, Gaia DR3 reduction
+cuser.reg                                         | Extension of "ds9" output file, User reference catalog reduction
+1.0                                               | Time instant tolerance for target identification (seconds) 
+2.0                                               | Position error radius for target identification (arcsec) 
+0                                                 | Pixel physical counts: 0 = from image header or 1 = from user (here)
+1.0                                               | Pixel physical counts: bscale;  Pixel = bscale * matrix + bzero
+0.0                                               | Pixel physical counts: bzero ;  Pixel = bscale * matrix + bzero
+-99                                               | Bitpix: -99 reads from image header; otherwise use 8, 16, 32, 64, -32, -64 following FITS conventions
+0                                                 | Littleendian x bigendian: byte-swap (0 = automatic; 1 = don't swap ; 2 = swap bytes)
+1                                                 | Sample a pixel to check for image reading configurations? (1) yes; (2) no
+01.0                                              | Detector gain (dfault 1.0 if not known)
+2                                                 | (x,y) centering PSF round-shaped objects: (1) Photogravity Center; (2) Circular or (3) Elliptical Gaussian; (4) Circular or (5) Elliptical Lorentzian
+0.9                                               | Object shape classification: eccentricity cutoff for identification of rounded/elongated objects (suggestion: e = 0.5 in normal conditions)
+15                                                | FOV RA  area for Gaia DR3 stars extraction and automatic identication (arcmin) .:. (negative values ===> default 2dg)
+15                                                | FOV Dec area for Gaia DR3 stars extraction and automatic identication (arcmin) .:. (negative values ===> default 2dg)
+2.0                                               | Error radius (arcsec) for cross-identification between brightest Gaia DR3 catalogue/measured objects
+2                                                 | Weight polynomial fit ? (1) yes; (2) no (weight=1 to all points)
+0.120                                             | (O-C) cutoff for outliers in (RA,DEC) reductions with Ephem catalogue            .:. negative values => sigma-clip factor for elimination of outliers
+0.060                                             | (O-C) cutoff for outliers in (RA,DEC) reductions with Gaia DR3 catalogue        .:. negative values => sigma-clip factor for elimination of outliers
+0.120                                             | (O-C) cutoff for outliers in (RA,DEC) reductions with User's reference catalogue .:. negative values => sigma-clip factor for elimination of outliers
+3                                                 | Polynomial model index for (x,y) <==> (X,Y) (RA,DEC) reductions: (see note below about model options)
+000                                               | first field (image, xy PRAIA file) to proccess  .:. zero for first and last fields -> proccess all fields
+000                                               | last  field (image, xy PRAIA file) to proccess  .:. zero for first and last fields -> proccess all fields
+************************************************************************************************************************************************************************************************************
+
+
+
+
+
+
+Note 1) Model options
+
+
+     Index = 0
+
+     Model is a 4 cte model from (RA,Dec) reductions
+
+     X = 1.C + 0.D + ax + by  (first N/2 points)
+
+     Y = 0.C + 1.D + ay - bx  (last  N/2 points)
+
+     or equivalently a rotation of (x,y) axes.
+
+
+     Index = 1
+
+     Model is a 1st degree polynomial
+     model from (RA,Dec) reductions.
+
+     (X or Y) = 1.c + ax + by
+
+
+     Index = 2
+
+     Model is a complete 2nd degree
+     polynomial model from (RA,Dec) reductions.
+
+     (X or Y) = 1.f + ax + by + cx^2 + dxy + ey^2
+
+
+     Index = 3
+
+     Model is a complete 3rd degree
+     polynomial model from (RA,Dec) reductions.
+
+     (X or Y) = 1.j + ax + by + cx^2 + dxy + ey^2 +
+                + fx^3 + gx^2y + hxy^2 + iy^3
+
+
+     Index = 4
+
+
+     Model is a complete 2nd degree
+     polynomial model plus a X or Y radial distortion
+     term of 3rd degree from (RA,Dec) reductions.
+
+     X = 1.g + ax + by + cx^2 + dxy + ey^2 +
+         + f x (x^2 + y^2)
+
+     Y = 1.g + ax + by + cx^2 + dxy + ey^2 +
+         + f y (x^2 + y^2)
+
+
+     Index = 5
+
+     Model is a complete 5rd degree
+     polynomial model from (RA,Dec) reductions.
+
+     (X or Y) = 1.u + ax + by + cx^2 + dxy + ey^2 +
+                + fx^3 + gx^2y + hxy^2 + iy^3 +
+                + jx^4 + kx^3y + lx^2y^2 + mxy^3 + ny^4 +
+                + ox^5 + px^4y + qx^3y^2 + rx^2y^3 +
+                + sxy^4 + ty^5
+
+
+     Index = 6
+
+     Model is a complete 2nd degree
+     polynomial model plus X or Y radial distortion
+     terms of 3rd and 5th degrees from
+     (RA,Dec) reductions.
+
+     X = 1.h + ax + by + cx^2 + dxy + ey^2 +
+         + f x (x^2 + y^2) + g x (x^2 + y^2)**2
+
+     Y = 1.h + ax + by + cx^2 + dxy + ey^2 +
+         + f y (x^2 + y^2) + g y (x^2 + y^2)**2
+
+
+     Index = 7
+
+     Model is a complete 3rd degree
+     polynomial model plus a X or Y radial distortion term
+     of the 5th order from (RA,Dec) reductions.
+
+     X = 1.k + ax + by + cx^2 + dxy + ey^2 +
+         + fx^3 + gx^2y + hxy^2 + iy^3 +
+         + j x (x^2 + y^2)^2
+
+     Y = 1.k + ax + by + cx^2 + dxy + ey^2 +
+         + fx^3 + gx^2y + hxy^2 + iy^3 +
+         + j y (x^2 + y^2)^2
+
+
+
+
+
+MPC reference catalogue codes:
+
+
+http://www.minorplanetcenter.org/iau/info/CatalogueCodes.html
+
+
+Char   Catalogue
+  a    USNO-A1.0
+  b    USNO-SA1.0
+  c    USNO-A2.0
+  d    USNO-SA2.0
+  e    UCAC-1
+  f    Tycho-1
+  g    Tycho-2
+  h    GSC-1.0
+  i    GSC-1.1
+  j    GSC-1.2
+  k    GSC-2.2
+  l    ACT
+  m    GSC-ACT
+  n    SDSS-DR8
+  o    USNO-B1.0
+  p    PPM
+  q    UCAC-4
+  r    UCAC-2
+  s    USNO-B2.0
+  t    PPMXL
+  u    UCAC-3
+  v    NOMAD
+  w    CMC-14
+  x    Hipparcos 2
+  y    Hipparcos
+  z    GSC (version unspecified)
+  A    AC
+  B    SAO 1984
+  C    SAO
+  D    AGK 3
+  E    FK4
+  F    ACRS
+  G    Lick Gaspra Catalogue
+  H    Ida93 Catalogue
+  I    Perth 70
+  J    COSMOS/UKST Southern Sky Catalogue
+  K    Yale
+  L    2MASS
+  M    GSC-2.3
+  N    SDSS-DR7
+  O    SST-RC1
+  P    MPOSC3
+  Q    CMC-15
+  R    SST-RC4
+  S    URAT-1
+  T    URAT-2
+  U    Gaia-DR1
+  V    Gaia-DR2
+  W    Gaia-DR3
+  X    Gaia-EDR3
