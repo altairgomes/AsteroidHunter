@@ -34,9 +34,7 @@ def differential_correction(R, v_earth, rho_hat, t, mu_sun, perturbations=None):
         best_cost = float('inf')
         r_earth_sun = np.linalg.norm(R[0])
         bounds = [
-            # Posição: região dentro de 5 AU do Sol
             (-5.0, 5.0), (-5.0, 5.0), (-5.0, 5.0),
-            # Velocidade: até 0.07
             (-0.07, 0.07), (-0.07, 0.07), (-0.07, 0.07)
         ]
         def objective(params):
@@ -240,25 +238,6 @@ def process_asteroid(name, observations, observatory=None):
    print(f"Ω = {Omega:.6f}°")
    print(f"ω = {omega:.6f}°")
    print(f"θ = {theta:.6f}°")
-
-   
-   if name == "Apophis":
-      a_real = 0.9223
-      e_real = 0.1911
-      i_real = 3.33
-      print("\n### Comparação com elementos reais (Apophis) ###")
-      print(f"a real ≈ {a_real:.4f} UA, diferença: {abs(a - a_real):.4f} UA")
-      print(f"e real ≈ {e_real:.4f}, diferença: {abs(e - e_real):.4f}")
-      print(f"i real ≈ {i_real:.2f}°, diferença: {abs(i - i_real):.2f}°")
-   
-   elif name == "2023 DZ2":
-      a_real = 2.082
-      e_real = 0.5242
-      i_real = 0.15
-      print("\n### Comparação com elementos reais (2023 DZ2) ###")
-      print(f"a real ≈ {a_real:.4f} UA, diferença: {abs(a - a_real):.4f} UA")
-      print(f"e real ≈ {e_real:.4f}, diferença: {abs(e - e_real):.4f}")
-      print(f"i real ≈ {i_real:.2f}°, diferença: {abs(i - i_real):.2f}°")
    
 
 # --------------------------------------------------------------------------------------------------------
@@ -287,7 +266,6 @@ def gauss_iod_method(R, rho_hat, t, mu=0.000295912208):
         rho_hat = [rho_hat[i] for i in indices]
         t = [t[i] for i in indices]
     
-    # Compute time differences in days
     tau1 = (t[0] - t[1]).total_seconds() / 86400.0
     tau3 = (t[2] - t[1]).total_seconds() / 86400.0
 
@@ -318,7 +296,6 @@ def gauss_iod_method(R, rho_hat, t, mu=0.000295912208):
     if abs(D0_det) < 1e-8: 
         print("Alerta: Observações quase coplanares. Tentando correção...")
         D0_det = np.sign(D0_det) * 1e-8 
-        # talvez usar o metodo de laplace nesses casos
 
     A = np.zeros((3, 3))
     b = np.zeros(3)
@@ -397,7 +374,7 @@ def gauss_iod_method(R, rho_hat, t, mu=0.000295912208):
                     if delta_v < best_iteration_delta_v:
                         best_iteration_delta_v = delta_v
                         best_iteration_result = (r2.copy(), v2.copy(), delta_v)
-                    if delta_v < 0.0001:  # ~1.7 m/s, muito bom
+                    if delta_v < 0.0001: 
                         print(f"Convergiu em {iteration+1} iterações!")
                         break
                     dot_product = np.dot(v2_from_3 - v2_from_1, r2)
