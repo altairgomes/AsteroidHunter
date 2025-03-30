@@ -38,15 +38,15 @@ zip-safe = false
 include-package-data = true
 
 [tool.setuptools.packages.find]
-include = ["asteroid_hunter*"]
-exclude = ["asteroid_hunter._dev*"]
+include = ["cosmotupi*"]
+exclude = ["cosmotupi._dev*"]
 
 [tool.setuptools_scm]
-version_file = "asteroid_hunter/_version.py"
+version_file = "cosmotupi/_version.py"
 
 [tool.pytest.ini_options]
 testpaths = [
-  "asteroid_hunter",
+  "cosmotupi",
   "docs",
 ]
 doctest_plus = "enabled"
@@ -55,20 +55,20 @@ addopts = "--doctest-rst"
 
 [tool.coverage.run]
 omit = [
- "asteroid_hunter/__init*",
- "asteroid_hunter/conftest.py",
- "asteroid_hunter/*setup_package*",
- "asteroid_hunter/tests/*",
- "asteroid_hunter/*/tests/*",
- "asteroid_hunter/extern/*",
- "asteroid_hunter/version*",
- "*/asteroid_hunter/__init*",
- "*/asteroid_hunter/conftest.py",
- "*/asteroid_hunter/*setup_package*",
- "*/asteroid_hunter/tests/*",
- "*/asteroid_hunter/*/tests/*",
- "*/asteroid_hunter/extern/*",
- "*/asteroid_hunter/version*",
+ "cosmotupi/__init*",
+ "cosmotupi/conftest.py",
+ "cosmotupi/*setup_package*",
+ "cosmotupi/tests/*",
+ "cosmotupi/*/tests/*",
+ "cosmotupi/extern/*",
+ "cosmotupi/version*",
+ "*/cosmotupi/__init*",
+ "*/cosmotupi/conftest.py",
+ "*/cosmotupi/*setup_package*",
+ "*/cosmotupi/tests/*",
+ "*/cosmotupi/*/tests/*",
+ "*/cosmotupi/extern/*",
+ "*/cosmotupi/version*",
 ]
 
 [tool.coverage.report]

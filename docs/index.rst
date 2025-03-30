@@ -1,4 +1,4 @@
-asteroid-hunter Documentation
+cosmotupi Documentation
 -----------------------------
 
 This is the documentation for asteroid-hunter.

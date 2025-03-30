@@ -44,7 +44,7 @@ def create_region(astrometry):
     f.close()
 
 def create_regions():
-    from asteroid_hunter.astrometry.astrometry import get_info
+    from cosmotupi.astrometry.astrometry import get_info
     astro_params = get_info()
     for astrometry in astro_params:
         create_region(astrometry)

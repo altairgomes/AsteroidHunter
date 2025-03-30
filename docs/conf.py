@@ -9,11 +9,11 @@ import datetime
 # -- Project information -----------------------------------------------------
 
 # The full version, including alpha/beta/rc tags
-from asteroid_hunter import __version__
+from cosmotupi import __version__
 
 release = __version__
 
-project = "asteroid-hunter"
+project = "cosmotupi"
 author = "Altair Gomes"
 copyright = f"{datetime.datetime.now().year}, {author}"  # noqa: A001
 

@@ -10,4 +10,4 @@ global-exclude *.pyc *.o
 # and should not be included in built tarballs
 prune asteroid_hunter/_dev
 
-include asteroid_hunter/data/PRAIA/*.f
+include cosmotupi/data/PRAIA/*.f

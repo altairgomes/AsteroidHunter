@@ -13,7 +13,7 @@ more information.
 Contributing
 ------------
 
-We love contributions! asteroid-hunter is open source,
+We love contributions! cosmotupi is open source,
 built on open source, and we'd love to have you hang out in our community.
 
 **Imposter syndrome disclaimer**: We want your help. No, really.
@@ -39,5 +39,5 @@ the errors and assumptions that seasoned contributors have glossed over.
 Note: This disclaimer was originally written by
 `Adrienne Lowe <https://github.com/adriennefriend>`_ for a
 `PyCon talk <https://www.youtube.com/watch?v=6Uj746j9Heo>`_, and was adapted by
-asteroid-hunter based on its use in the README file for the
+cosmotupi based on its use in the README file for the
 `MetPy project <https://github.com/Unidata/MetPy>`_.

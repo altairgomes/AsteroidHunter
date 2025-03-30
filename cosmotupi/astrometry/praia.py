@@ -8,7 +8,7 @@ def run_praia(site):
     :return:
     """
     if site == "PANSTARRS1":
-        from asteroid_hunter.data.PANSTARRS1 import praia_astro, praia_header, bad_fluxes
+        from cosmotupi.data.PANSTARRS1 import praia_astro, praia_header, bad_fluxes
     else:
         raise ValueError("Site {} not recognized".format(site))
 
@@ -29,7 +29,7 @@ def run_praia(site):
     os.system('./PRAIA_astrometry_3_0_04 < PRAIA_astrometry.dat > relatorio_praia_astrometry'.format(site))
 
 def compile_praia():
-    from asteroid_hunter.data.PRAIA import praia_header_source, praia_astro_source
+    from cosmotupi.data.PRAIA import praia_header_source, praia_astro_source
     # Verificar compilação do PRAIA
     with open("PRAIA_FITS_header_extraction_3_0_04.f", "w") as f:
         f.writelines(praia_header_source)
